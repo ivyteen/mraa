@@ -146,6 +146,7 @@ i2c_detect_devices(int bus)
 {
     mraa_i2c_context i2c = mraa_i2c_init(bus);
     if (i2c == NULL) {
+        printf("i2c init failed\n");
         return;
     }
     int addr;
