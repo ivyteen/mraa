@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "arm/96boards.h"
+#include "arm/axolotl_boards.h"
 #include "arm/de_nano_soc.h"
 #include "arm/banana.h"
 #include "arm/beaglebone.h"
@@ -94,6 +95,8 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;
+        else if (mraa_file_contains("/proc/device-tree/model", "RK3229"))
+            platform_type = MRAA_AXOLOTL_BOARDS;
     }
 
     switch (platform_type) {
@@ -114,6 +117,9 @@ mraa_arm_platform()
             break;
         case MRAA_DE_NANO_SOC:
             plat = mraa_de_nano_soc();
+            break;
+        case MRAA_AXOLOTL_BOARDS:
+            plat = mraa_axolotl_boards();
             break;
         default:
             plat = NULL;

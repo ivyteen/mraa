@@ -40,6 +40,7 @@ ARM
 * [Beaglebone Black](../master/docs/beaglebone.md)
 * [phyBOARD-Wega](../master/docs/phyboard-wega.md)
 * [96Boards](../master/docs/96boards.md)
+* [Seeed Axolotl (RK3229) Boards](../master/docs/axolotl.md)
 
 FPGA
 ----
