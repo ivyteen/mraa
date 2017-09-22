@@ -39,38 +39,45 @@
 #define MRAA_RESPEAKER2_PHY_PIN_COUNT 12
 
 /*
-Header pin index definition:
+Pin index definition for headers :
 
-8 pin header (The square pad is 0):
--------------
+**8 pin header**
 0 <- + + -> 1
 2 <- + + -> 3
 4 <- + + -> 5
 6 <- + + -> 7
+(The square pad is 0)
 
-grove socket:
--------------
--+ -> SCL/8
--+ -> SDA/9
--+ -> VCC/10
--+ -> GND/11
-The silk "I2C" at the bottom
+**Grove socket**
+-+ -> 8(SCL)
+-+ -> 9(SDA)
+-+ -> 10(VCC)
+-+ -> 11(GND)
+(The silk "I2C" at the botto)
 
-MRAA PIN MAP:
-GPIO:
-MRAA              HEADER_PIN_INDEX            SYSFS_PIN          RK3229_PIN
-0                 0                           91                 GPIO2_D3
-2                 2                           122                GPIO3_D2
-3                 3                           123                GPIO3_D3
-4                 4                           17                 GPIO0_C1
-5                 5                           67                 GPIO2_A3
-7                 7                           13                 GPIO0_B5
-8                 8                           85                 GPIO2_C5
-9                 9                           84                 GPIO2_C4
+**GPIO**
 
-I2C:
-0                 8                           --                 I2C2_SCL
-                  9                           --                 I2C2_SDA
+| MRAA | HEADER PIN INDEX | SYSFS PIN | RK3229 PIN |
+| :--- | :--------------- | :-------- | :--------- |
+| 0    | 0                | 91        | GPIO2_D3   |
+| 1    | 1                | --        | VCC        |
+| 2    | 2                | 43        | GPIO1_B3   |
+| 3    | 3                | 127       | GPIO3_D7   |
+| 4    | 4                | 17        | GPIO0_C1   |
+| 5    | 5                | 67        | GPIO2_A3   |
+| 6    | 6                | --        | GND        |
+| 7    | 7                | 13        | GPIO0_B5   |
+| 8    | 8                | 85        | GPIO2_C5   |
+| 9    | 9                | 84        | GPIO2_C4   |
+| 10   | 10               | --        | VCC        |
+| 11   | 11               | --        | GND        |
+
+**I2C**
+
+| MRAA | HEADER PIN INDEX | SYSFS PIN | RK3229 PIN |
+| :--- | :--------------- | :-------- | :--------- |
+| 0    | 8                | --        | I2C2_SCL   |
+| 0    | 9                | --        | I2C2_SDA   |
 
 */
 int
@@ -111,20 +118,15 @@ mraa_add_board_respeaker2(mraa_board_t* b)
     strncpy(b->pins[1].name, "VCC", MRAA_PIN_NAME_SIZE);
     b->pins[1].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
-    // strncpy(b->pins[2].name, "GPIO122", MRAA_PIN_NAME_SIZE);
-    // b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    // b->pins[2].gpio.pinmap = 122;
-    // b->pins[2].gpio.mux_total = 0;
+    strncpy(b->pins[2].name, "GPIO43", MRAA_PIN_NAME_SIZE);
+    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[2].gpio.pinmap = 43;
+    b->pins[2].gpio.mux_total = 0;
 
-    // strncpy(b->pins[3].name, "GPIO123", MRAA_PIN_NAME_SIZE);
-    // b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    // b->pins[3].gpio.pinmap = 123;
-    // b->pins[3].gpio.mux_total = 0;
-    strncpy(b->pins[2].name, "IR_RX?", MRAA_PIN_NAME_SIZE);
-    b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
-
-    strncpy(b->pins[3].name, "SPDIF_TX", MRAA_PIN_NAME_SIZE);
-    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    strncpy(b->pins[3].name, "GPIO127", MRAA_PIN_NAME_SIZE);
+    b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[3].gpio.pinmap = 127;
+    b->pins[3].gpio.mux_total = 0;
 
     strncpy(b->pins[4].name, "GPIO17", MRAA_PIN_NAME_SIZE);
     b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
@@ -165,6 +167,12 @@ mraa_add_board_respeaker2(mraa_board_t* b)
     b->pins[9].gpio.pinmap = 84;
     b->pins[9].gpio.mux_total = 0;
     b->pins[9].i2c.mux_total = 0;
+
+    strncpy(b->pins[10].name, "VCC", MRAA_PIN_NAME_SIZE);
+    b->pins[10].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+
+    strncpy(b->pins[11].name, "GND", MRAA_PIN_NAME_SIZE);
+    b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
 
     // BUS DEFINITIONS
 
