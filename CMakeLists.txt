@@ -166,12 +166,14 @@ if (DETECTED_ARCH STREQUAL "i586" OR DETECTED_ARCH STREQUAL "x86_64"
   set (X86PLAT ON)
 elseif (DETECTED_ARCH MATCHES "arm.*")
   set (ARMPLAT ON)
+elseif (DETECTED_ARCH MATCHES "mips")
+  set (MIPSPLAT ON)
 elseif (DETECTED_ARCH STREQUAL "MOCK")
   set (MOCKPLAT ON)
 elseif (DETECTED_ARCH STREQUAL "PERIPHERALMAN")
   set (PERIPHERALMAN ON)
 else ()
-  message (FATAL_ERROR "Only x86, arm, PERIPHERALMAN and mock platforms currently supported")
+  message (FATAL_ERROR "Only x86, arm, mips, PERIPHERALMAN and mock platforms currently supported")
 endif()
 
 if (BUILDSWIGPYTHON OR BUILDTESTS)
@@ -180,8 +182,8 @@ endif ()
 
 if (BUILDDOC)
   # add a target to generate API documentation with Doxygen
-  find_package (Doxygen)
-  if (DOXYGEN_FOUND)
+  find_package (Doxygen 1.8 REQUIRED)
+  if (DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_GREATER "1.8")
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
     if (BUILDSWIGJAVA)
       configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.java.in ${CMAKE_CURRENT_BINARY_DIR}/src/java/Doxyfile @ONLY)
@@ -191,7 +193,9 @@ if (BUILDDOC)
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
-  endif (DOXYGEN_FOUND)
+  else ()
+    message (SEND_ERROR "ERROR - Failed to find a compatible version of Doxygen. API doc will not be generated")
+  endif (DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_GREATER "1.8")
 endif ()
 
 if (IPK)

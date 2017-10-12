@@ -5,7 +5,9 @@ build out of tree so the recommended way is to clone from git and make a `build/
 directory inside the clone directory.
 
 For building imraa check @ref buildingimraa page.
+
 ## Build dependencies
+
 Not all these are required but if you're unsure of what you're doing this is
 what you'll need:
 * [SWIG](http://swig.org) 3.0.5+
@@ -25,7 +27,6 @@ To build the documentation you'll also need:
 * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) 1.8.9.1+
 * [Graphviz](http://graphviz.org/) 2+ (For Doxygen graph generation)
 * [Sphinx](http://sphinx-doc.org/) 1.1.3+ (For Python docs)
-
 
 ## Basic build steps
 
@@ -77,7 +78,7 @@ A few recommended options:
 Changing install path from `/usr/local` to `/usr`:
  `-DCMAKE_INSTALL_PREFIX:PATH=/usr`
 
-Building debug build - adds `-g` and disables optimisations - this will force a
+Building debug build - adds `-g` and disables optimizations - this will force a
 full rebuild:
  `-DCMAKE_BUILD_TYPE=DEBUG`
 
@@ -108,7 +109,7 @@ You can also enable -Wall for gcc before running cmake by exporting your wanted
 CC flags to the CC env var
   `export CC="gcc -Wall"`
 
-Sometimes it's nice to build a static libary, on Linux systems just set
+Sometimes it's nice to build a static library, on Linux systems just set
    `-DBUILD_SHARED_LIBS=OFF`
 
 ## Dependencies continued
@@ -121,7 +122,7 @@ failure when building the JavaScript module. The Python module builds with SWIG
 
 During the build, we'll assume you're building from git, note that if you
 compile with `git` installed your version of mraa will be versioned with `git
-desribe --tag` to make it easy for intentification. You can easily modify
+describe --tag` to make it easy for identification. You can easily modify
 version.c in build/src. If you don't build from a git tree then you will simply
 have a version which matches the latest released version of mraa.
 
@@ -151,6 +152,7 @@ tar caf mraa.tar.bz2 cov-int
 ~~~~~~~~~~~~~
 
 ## Building Java bindings
+
 Have JAVA_HOME set to JDK install directory. Most distributions set this from `/etc/profile.d/`
  and have a way of switching between alternatives. We support both OpenJDK and Oracle's JDK.
  On Arch Linux with OpenJDK 8 you'll have to set this yourself like this:
@@ -165,7 +167,7 @@ javac -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example.java
 ~~~~~~~~~~~~~
 To run, make sure `libmraajava.so` is in `LD_LIBRARY_PATH`
  ~~~~~~~~~~~~~{.sh}
-jave -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
+java -cp $DIR_WHERE_YOU_INSTALLED_MRAA/mraa.jar:. Example
 ~~~~~~~~~~~~~
 
 If you want to add or improve Java bindings for mraa, please follow the <a href="https://github.com/intel-iot-devkit/upm/blob/master/docs/creating_java_bindings.md">Creating Java Bindings Guide</a>.
@@ -190,17 +192,37 @@ cmake -DRPM=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 ## Building for the Android Things Peripheralmanager Client
 
 Requirements:
-* Android [Things Native Library](https://github.com/androidthings/native-libandroidthings)
-* Android NDK >= 14b
+* [Android Things Native Library](https://github.com/androidthings/native-libandroidthings) >= 0.5.1
+* [Android NDK](https://developer.android.com/ndk/downloads/index.html) >= 14b
 
-The [Things Native Library](https://github.com/androidthings/native-libandroidthings) contains a CMake find_package module
-[FindAndroidThings.cmake](https://github.com/androidthings/native-libandroidthings/blob/master/FindAndroidThings.cmake). Make sure the directory containing this module is
-added to the CMAKE_MODULE_PATH.
+The [Android NDK](https://developer.android.com/ndk/downloads/index.html) contains a CMake find_package module
+`FindAndroidThings.cmake`. Make sure the directory containing this module is
+added to the `CMAKE_MODULE_PATH`.
 
-### NDK r14b
+### Android NDK r14b
 
 ~~~~~~~~~~~~~{.sh}
-cmake -DBUILDSWIG=OFF -DBUILDARCH=PERIPHERALMAN -DANDROID_TOOLCHAIN_NAME=x86-i686 -DCMAKE_TOOLCHAIN_FILE=/path/to/android-ndk-r14b/build/cmake/android.toolchain.cmake -DCMAKE_MODULE_PATH=/path/to/native-libandroidthings ..
+NDK_HOME="/path/to/android-ndk-r14b"
+ANDROIDTHINGS_NATIVE_LIB="/path/to/native-libandroidthings-0.5.1-devpreview"
+
+cmake -DBUILDSWIG=ON \
+      -DBUILDSWIGPYTHON=OFF \
+      -DBUILDSWIGNODE=OFF \
+      -DBUILDSWIGJAVA=ON \
+      -DANDROID_COMPILER_FLAGS_CXX='-std=c++11' \
+      -DANDROID_PIE=1 \
+      -DANDROID_PLATFORM=android-24 \
+      -DANDROID_STL_FORCE_FEATURES=ON \
+      -DANDROID_STL=c++_shared \
+      -DANDROID_TOOLCHAIN_NAME=x86-i686 \
+      -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
+      -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
+      -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=BOTH \
+      -DCMAKE_FIND_ROOT_PATH=$NDK_HOME/platforms/android-24/arch-x86/ \
+      -DCMAKE_MODULE_PATH=$ANDROIDTHINGS_NATIVE_LIB \
+      -DCMAKE_TOOLCHAIN_FILE=$NDK_HOME/build/cmake/android.toolchain.cmake \
+      -DBUILDARCH=PERIPHERALMAN \
+      ..
 ~~~~~~~~~~~~~
 
 ## Building with Docker
@@ -269,7 +291,7 @@ $ docker run \
       --env BUILDSWIGPYTHON=ON \
       --env BUILDSWIGJAVA=OFF \
       --env BUILDSWIGNODE=OFF \
-      dnoliver/mraa-python \
+      inteliotdevkit/mraa-python \
       bash -c "./scripts/run-cmake.sh && make -Cbuild _python2-mraa"
 ```
 
@@ -285,11 +307,11 @@ to proxy settings:
 
 **docker run fails to access the internet**
 
-docker-compose will automatically take `http_proxy`, `https_proxy`, and `no_proxy`
+Docker-compose will automatically take `http_proxy`, `https_proxy`, and `no_proxy`
 environment variables and use it as build arguments. Be sure to properly configure
 this variables before building.
 
-docker, unlinke docker-compose, do not take the proxy settings from the environment
+Docker, unlike docker-compose, does not take the proxy settings from the environment
 automatically. You need to send them as environment arguments:
 
 ```sh
@@ -303,6 +325,6 @@ $ docker run \
     --env http_proxy=$http_proxy \
     --env https_proxy=$https_proxy \
     --env no_proxy=$no_proxy \
-    dnoliver/mraa-python \
+    inteliotdevkit/mraa-python \
     bash -c "./scripts/run-cmake.sh && make -Cbuild _python2-mraa"
 ```

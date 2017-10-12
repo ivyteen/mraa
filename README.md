@@ -42,6 +42,11 @@ ARM
 * [96Boards](../master/docs/96boards.md)
 * [Seeed Axolotl (RK3229) Boards](../master/docs/axolotl.md)
 
+MIPS
+---
+* [Linkit Smart 7688](../master/docs/linkit_7688.md)
+* [Onion Omega2](../master/docs/omega2.md)
+
 FPGA
 ----
 * [DE10-Nano](../master/docs/de_nano_soc.md)
@@ -75,10 +80,11 @@ https://launchpad.net/~mraa/+archive/ubuntu/mraa
 ```bash
 sudo add-apt-repository ppa:mraa/mraa
 sudo apt-get update
-sudo apt-get install libmraa1 libmraa-dev mraa-tools python-mraa python3-mraa
+sudo apt-get install libmraa1 libmraa-dev libmraa-java python-mraa python3-mraa node-mraa mraa-tools
 ```
 
-Node.js package is available separately.
+Running MRAA tools or applications on Ubuntu systems requires elevated permissions
+(e.g. run with `sudo`).
 
 Install on Arch Linux
 ---------------------
@@ -100,7 +106,7 @@ sudo zypper in mraa
 Installing for Node.js only
 ---------------------------
 
-> Note: Node.js 7.0.0+ is not currntly supported. You'll have to downgrade to 6.x.x.
+> Note: Node.js 7.0.0+ is not currently supported. You'll have to downgrade to 6.x.x.
 
 You can also install just the node.js mraa module by using npm. You will need a
 C++ compiler and the node development headers, however it's not required to
