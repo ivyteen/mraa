@@ -26,16 +26,16 @@ Pin index definition for headers :
 
 | MRAA | HEADER PIN INDEX | SYSFS PIN | RK3229 PIN |
 | :--- | :--------------- | :-------- | :--------- |
-| 0    | 0                | 91        | GPIO2_D3   |
+| 0    | 0                | 1091        | GPIO2_D3   |
 | 1    | 1                | --        | VCC        |
-| 2    | 2                | 43        | GPIO1_B3   |
-| 3    | 3                | 127       | GPIO3_D7   |
-| 4    | 4                | 17        | GPIO0_C1   |
-| 5    | 5                | 67        | GPIO2_A3   |
+| 2    | 2                | 1043        | GPIO1_B3   |
+| 3    | 3                | 1127       | GPIO3_D7   |
+| 4    | 4                | 1017        | GPIO0_C1   |
+| 5    | 5                | 1067        | GPIO2_A3   |
 | 6    | 6                | --        | GND        |
-| 7    | 7                | 13        | GPIO0_B5   |
-| 8    | 8                | 85        | GPIO2_C5   |
-| 9    | 9                | 84        | GPIO2_C4   |
+| 7    | 7                | 1013        | GPIO0_B5   |
+| 8    | 8                | 1085        | GPIO2_C5   |
+| 9    | 9                | 1084        | GPIO2_C4   |
 | 10   | 10               | --        | VCC        |
 | 11   | 11               | --        | GND        |
 

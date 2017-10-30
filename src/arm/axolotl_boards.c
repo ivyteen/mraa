@@ -59,16 +59,16 @@ Pin index definition for headers :
 
 | MRAA | HEADER PIN INDEX | SYSFS PIN | RK3229 PIN |
 | :--- | :--------------- | :-------- | :--------- |
-| 0    | 0                | 91        | GPIO2_D3   |
+| 0    | 0                | 1091        | GPIO2_D3   |
 | 1    | 1                | --        | VCC        |
-| 2    | 2                | 43        | GPIO1_B3   |
-| 3    | 3                | 127       | GPIO3_D7   |
-| 4    | 4                | 17        | GPIO0_C1   |
-| 5    | 5                | 67        | GPIO2_A3   |
+| 2    | 2                | 1043        | GPIO1_B3   |
+| 3    | 3                | 1127       | GPIO3_D7   |
+| 4    | 4                | 1017        | GPIO0_C1   |
+| 5    | 5                | 1067        | GPIO2_A3   |
 | 6    | 6                | --        | GND        |
-| 7    | 7                | 13        | GPIO0_B5   |
-| 8    | 8                | 85        | GPIO2_C5   |
-| 9    | 9                | 84        | GPIO2_C4   |
+| 7    | 7                | 1013        | GPIO0_B5   |
+| 8    | 8                | 1085        | GPIO2_C5   |
+| 9    | 9                | 1084        | GPIO2_C4   |
 | 10   | 10               | --        | VCC        |
 | 11   | 11               | --        | GND        |
 
@@ -112,7 +112,7 @@ mraa_add_board_respeaker2(mraa_board_t* b)
 
     strncpy(b->pins[0].name, "GPIO91", MRAA_PIN_NAME_SIZE);
     b->pins[0].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[0].gpio.pinmap = 91;
+    b->pins[0].gpio.pinmap = 1091;
     b->pins[0].gpio.mux_total = 0;
 
     strncpy(b->pins[1].name, "VCC", MRAA_PIN_NAME_SIZE);
@@ -120,22 +120,22 @@ mraa_add_board_respeaker2(mraa_board_t* b)
 
     strncpy(b->pins[2].name, "GPIO43", MRAA_PIN_NAME_SIZE);
     b->pins[2].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[2].gpio.pinmap = 43;
+    b->pins[2].gpio.pinmap = 1043;
     b->pins[2].gpio.mux_total = 0;
 
     strncpy(b->pins[3].name, "GPIO127", MRAA_PIN_NAME_SIZE);
     b->pins[3].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[3].gpio.pinmap = 127;
+    b->pins[3].gpio.pinmap = 1127;
     b->pins[3].gpio.mux_total = 0;
 
     strncpy(b->pins[4].name, "GPIO17", MRAA_PIN_NAME_SIZE);
     b->pins[4].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[4].gpio.pinmap = 17;
+    b->pins[4].gpio.pinmap = 1017;
     b->pins[4].gpio.mux_total = 0;
 
     strncpy(b->pins[5].name, "GPIO67", MRAA_PIN_NAME_SIZE);
     b->pins[5].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[5].gpio.pinmap = 67;
+    b->pins[5].gpio.pinmap = 1067;
     b->pins[5].gpio.mux_total = 0;
 
     strncpy(b->pins[6].name, "GND", MRAA_PIN_NAME_SIZE);
@@ -143,7 +143,7 @@ mraa_add_board_respeaker2(mraa_board_t* b)
 
     strncpy(b->pins[7].name, "GPIO13", MRAA_PIN_NAME_SIZE);
     b->pins[7].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
-    b->pins[7].gpio.pinmap = 13;
+    b->pins[7].gpio.pinmap = 1013;
     b->pins[7].gpio.mux_total = 0;
 
     if (i2c2_enabled){
@@ -153,7 +153,7 @@ mraa_add_board_respeaker2(mraa_board_t* b)
         strncpy(b->pins[8].name, "GPIO85", MRAA_PIN_NAME_SIZE);
         b->pins[8].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
     }
-    b->pins[8].gpio.pinmap = 85;
+    b->pins[8].gpio.pinmap = 1085;
     b->pins[8].gpio.mux_total = 0;
     b->pins[8].i2c.mux_total = 0;
 
@@ -164,7 +164,7 @@ mraa_add_board_respeaker2(mraa_board_t* b)
         strncpy(b->pins[9].name, "GPIO84", MRAA_PIN_NAME_SIZE);
         b->pins[9].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 1, 0, 0 };
     }
-    b->pins[9].gpio.pinmap = 84;
+    b->pins[9].gpio.pinmap = 1084;
     b->pins[9].gpio.mux_total = 0;
     b->pins[9].i2c.mux_total = 0;
 
