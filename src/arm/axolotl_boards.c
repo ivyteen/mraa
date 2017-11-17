@@ -72,6 +72,11 @@ Pin index definition for headers :
 | 10   | 10               | --        | VCC        |
 | 11   | 11               | --        | GND        |
 
+**Pixel Ring Enable Pin**
+| MRAA | HEADER PIN INDEX | SYSFS PIN | RK3229 PIN |
+| :--- | :--------------- | :-------- | :--------- |
+| 12   |                  | 1066      |            |
+
 **I2C**
 
 | MRAA | HEADER PIN INDEX | SYSFS PIN | RK3229 PIN |
@@ -173,6 +178,11 @@ mraa_add_board_respeaker2(mraa_board_t* b)
 
     strncpy(b->pins[11].name, "GND", MRAA_PIN_NAME_SIZE);
     b->pins[11].capabilities = (mraa_pincapabilities_t){ 1, 0, 0, 0, 0, 0, 0, 0 };
+    
+    strncpy(b->pins[12].name, "GPIO66", MRAA_PIN_NAME_SIZE);
+    b->pins[12].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[12].gpio.pinmap = 1066;
+    b->pins[12].gpio.mux_total = 0;
 
     // BUS DEFINITIONS
 
