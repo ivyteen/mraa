@@ -90,7 +90,7 @@ mraa_add_board_respeaker2(mraa_board_t* b)
 {
     unsigned int i2c2_enabled = 1;
 
-    if (mraa_file_exist("/sys/class/i2c-dev/i2c-2")) {
+    if (mraa_file_exist("/sys/class/i2c-dev/i2c-3")) {
         i2c2_enabled = 1;
     } else {
         i2c2_enabled = 0;
@@ -189,8 +189,8 @@ mraa_add_board_respeaker2(mraa_board_t* b)
     // I2C
     if (i2c2_enabled){
         b->i2c_bus_count += 1;
-        b->i2c_bus[0].bus_id = 2;
-        b->def_i2c_bus = 2;
+        b->i2c_bus[0].bus_id = 3;
+        b->def_i2c_bus = 3;
         b->i2c_bus[0].scl = 8;  // here should be the b->pins index
         b->i2c_bus[0].sda = 9;
     }else{
