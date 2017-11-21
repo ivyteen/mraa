@@ -36,7 +36,7 @@
 
 // ReSpeaker Core v2.0
 #define PLATFORM_NAME_RESPEAKVER2 "ReSpeaker Core v2.0"
-#define MRAA_RESPEAKER2_PHY_PIN_COUNT 12
+#define MRAA_RESPEAKER2_PHY_PIN_COUNT 13 
 
 /*
 Pin index definition for headers :
