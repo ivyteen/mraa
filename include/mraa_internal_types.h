@@ -106,6 +106,26 @@ struct _firmata {
 };
 #endif
 
+struct _gpio_group {
+    int is_required;
+    int dev_fd;
+    int gpiod_handle;
+    unsigned int gpio_chip;
+    /* We can have multiple lines in a gpio group. */
+    unsigned int num_gpio_lines;
+    unsigned int *gpio_lines;
+
+    /* R/W stuff.*/
+    unsigned char *rw_values;
+    /* Reverse mapping to original pin number indexes. */
+    unsigned int *gpio_group_to_pins_table;
+
+    unsigned int flags;
+
+    /* Event specific fields. */
+    int *event_handles;
+};
+
 /**
  * A structure representing a gpio pin.
  */
@@ -134,7 +154,23 @@ struct _gpio {
 #ifdef PERIPHERALMAN
     AGpio *bgpio;
 #endif
+
+    struct _gpio_group *gpio_group;
+    unsigned int num_chips;
+    int *pin_to_gpio_table;
+    unsigned int num_pins;
+    mraa_gpio_events_t events;
+    int *provided_pins;
+
+    struct _gpio *next;
 };
+
+/* Macro for looping over gpio chips. */
+#define for_each_gpio_group(group, dev) \
+    for (int k = 0; \
+        k < dev->num_chips && (group = &dev->gpio_group[k]); \
+        ++k) \
+            if (dev->gpio_group[k].is_required)
 
 /**
  * A structure representing a I2C bus
@@ -315,6 +351,10 @@ typedef struct {
     mraa_mux_t mux[6]; /** Array holding information about mux */
     unsigned int output_enable; /** Output Enable GPIO, for level shifting */
     mraa_pin_cap_complex_t complex_cap;
+
+    /* GPIOD_INTERFACE */
+    unsigned int gpio_chip;
+    unsigned int gpio_line;
     /*@}*/
 } mraa_pin_t;
 
@@ -447,6 +487,7 @@ typedef struct _board_t {
     mraa_pininfo_t* pins;     /**< Pointer to pin array */
     mraa_adv_func_t* adv_func;    /**< Pointer to advanced function disptach table */
     struct _board_t* sub_platform;     /**< Pointer to sub platform */
+    mraa_boolean_t chardev_capable;  /**< Decide what interface is being used: old sysfs or new char device*/
     /*@}*/
 } mraa_board_t;
 

@@ -16,7 +16,7 @@ The intent is to make it easier for developers and sensor manufacturers to map
 their sensors & actuators on top of supported hardware and to allow control of
 low level communication protocol by high level languages & constructs.
 
-[![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/intel-iot-devkit/mraa)
+[![Build Status](https://travis-ci.org/intel-iot-devkit/mraa.svg?branch=master)](https://travis-ci.org/intel-iot-devkit/mraa) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=mraa-master&metric=alert_status)](https://sonarcloud.io/dashboard?id=mraa-master)
 
 Supported Boards
 ================
@@ -74,7 +74,7 @@ Installing on your board
 Installing on Ubuntu
 --------------------
 
-Here is a PPA for installing on ubuntu:
+Here is a PPA for installing on Ubuntu Xenial or Bionic:
 https://launchpad.net/~mraa/+archive/ubuntu/mraa
 
 ```bash
@@ -106,11 +106,12 @@ sudo zypper in mraa
 Installing for Node.js only
 ---------------------------
 
-> Note: Node.js 7.0.0+ is not currently supported. You'll have to downgrade to 6.x.x.
+> Note: Node.js 7.0.0+ is not currently supported unless compiling with a patched
+vesion of SWIG. See the corresponding section and document below.
 
 You can also install just the node.js mraa module by using npm. You will need a
 C++ compiler and the node development headers, however it's not required to
-have SWIG installed.
+have SWIG installed. This works for node versions 6.x.x and prior.
 
 ```bash
 npm install mraa
@@ -123,28 +124,6 @@ in /usr/lib.
 
 Subplatforms (i.e. Firmata) have to be added manually with this kind of install
 from your application, as shown in [this example](examples/javascript/firmata.js).
-
-Installing on Intel 32bit Yocto based opkg image
-------------------------------------------------
-
-See the section below on compiling or use our repository to install on a glibc
-based yocto poky image that supports opkg. Adding this repository is as simple
-as and you'll have the latest stable tagged build of mraa installed!
-
-``` bash
-echo "src mraa-upm http://iotdk.intel.com/repos/3.5/intelgalactic/opkg/i586" > /etc/opkg/mraa-upm.conf
-opkg update
-opkg install mraa
-```
-
-If you would like to get the latest & greatest builds from master HEAD you can
-use our -dev repository
-
-```bash
-echo "src mraa-upm http://iotdk.intel.com/repos/3.5/intelgalactic-dev/opkg/i586" > /etc/opkg/mraa-upm.conf
-opkg update
-opkg install mraa
-```
 
 Compiling
 =========

@@ -21,10 +21,7 @@ services:
       - JSONPLAT=${JSONPLAT:-OFF}
       - IMRAA=${IMRAA:-OFF}
       - FTDI4222=${FTDI4222:-OFF}
-      - IPK=${IPK:-OFF}
-      - RPM=${RPM:-OFF}
       - ENABLEEXAMPLES=${ENABLEEXAMPLES:-OFF}
-      - INSTALLGPIOTOOL=${INSTALLGPIOTOOL:-OFF}
       - INSTALLTOOLS=${INSTALLTOOLS:-ON}
       - CC=${CC:-clang-3.8}
       - CXX=${CXX:-clang++-3.8}
@@ -35,6 +32,14 @@ services:
   all:
     extends: base
     image: inteliotdevkit/mraa-all
+
+  minimal:
+    extends: base
+    environment:
+      - BUILDSWIG=OFF
+      - INSTALLTOOLS=OFF
+      - JSONPLAT=OFF
+    command: bash -c "./scripts/run-cmake.sh && cd build && make && ctest -R unit --output-on-failure"
 
   doc:
     extends: all
@@ -106,33 +111,19 @@ services:
       - FTDI4222=ON
     command: bash -c "./scripts/run-cmake.sh && make -Cbuild"
 
-  ipk:
-    extends: all
-    environment:
-      - IPK=ON
-      - ENABLEEXAMPLES=ON
-    command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
-
-  rpm:
-    extends: all
-    environment:
-      - RPM=ON
-      - ENABLEEXAMPLES=ON
-    command: bash -c "./scripts/run-cmake.sh && make -Cbuild package"
-
   python2:
     extends: base
     image: inteliotdevkit/mraa-python
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGPYTHON=ON
-    command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa && ctest --output-on-failure"
+    command: bash -c "./scripts/run-cmake.sh && cd build && make _python2-mraa tests-unit && ctest --output-on-failure"
 
   python3:
     extends: python2
     environment:
       - USEPYTHON3TESTS=ON
-    command: bash -c "./scripts/run-cmake.sh && cd build && make _python3-mraa && ctest --output-on-failure"
+    command: bash -c "./scripts/run-cmake.sh && cd build && make _python3-mraa tests-unit && ctest --output-on-failure"
 
   java:
     extends: base
@@ -140,7 +131,7 @@ services:
     environment:
       - BUILDSWIG=ON
       - BUILDSWIGJAVA=ON
-    command: bash -c "./scripts/run-cmake.sh && cd build && make mraajava && ctest --output-on-failure"
+    command: bash -c "./scripts/run-cmake.sh && cd build && make mraajava tests-unit && ctest --output-on-failure"
 
   android:
     extends: java

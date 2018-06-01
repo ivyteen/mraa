@@ -45,7 +45,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <limits.h>
-
+#include <sys/utsname.h>
 
 #if defined(IMRAA)
 #include <json-c/json.h>
@@ -57,6 +57,7 @@
 #include "firmata/firmata_mraa.h"
 #include "grovepi/grovepi.h"
 #include "gpio.h"
+#include "gpio/gpio_chardev.h"
 #include "version.h"
 #include "i2c.h"
 #include "pwm.h"
@@ -96,6 +97,26 @@ mraa_set_log_level(int level)
     }
     syslog(LOG_NOTICE, "Invalid loglevel %d requested", level);
     return MRAA_ERROR_INVALID_PARAMETER;
+}
+
+mraa_boolean_t mraa_is_kernel_chardev_interface_compatible()
+{
+    if (mraa_get_number_of_gpio_chips() <= 0) {
+        syslog(LOG_NOTICE, "gpio: platform supports chardev but kernel doesn't, falling back to sysfs");
+        return 0;
+    }
+
+    return 1;
+}
+
+mraa_boolean_t mraa_is_platform_chardev_interface_capable()
+{
+    if (plat->chardev_capable) {
+        return mraa_is_kernel_chardev_interface_compatible();
+    }
+
+    syslog(LOG_NOTICE, "gpio: platform doesn't support chardev, falling back to sysfs");
+    return 0;
 }
 
 /**
@@ -218,6 +239,11 @@ imraa_init()
         return MRAA_ERROR_NO_RESOURCES;
     }
 
+    plat->chardev_capable = mraa_is_platform_chardev_interface_capable();
+    if (plat->chardev_capable) {
+        syslog(LOG_NOTICE, "gpio: support for chardev interface is activated");
+    }
+
     syslog(LOG_NOTICE, "libmraa initialised for platform '%s' of type %d", mraa_get_platform_name(), mraa_get_platform_type());
     return MRAA_SUCCESS;
 }
@@ -256,21 +282,22 @@ mraa_deinit()
             }
             free(sub_plat);
         }
-#if defined(JSONPLAT)
         if (plat->platform_type == MRAA_JSON_PLATFORM) {
             // Free the platform name
             free(plat->platform_name);
             plat->platform_name = NULL;
+        }
 
-            int i = 0;
-            // Free the UART device path
+        int i = 0;
+        // Free the UART device path
+        if ((plat->platform_type == MRAA_JSON_PLATFORM) || (plat->platform_type == MRAA_UP2)) {
             for (i = 0; i < plat->uart_dev_count; i++) {
                 if (plat->uart_dev[i].device_path != NULL) {
                     free(plat->uart_dev[i].device_path);
                 }
             }
         }
-#endif
+
         free(plat);
         plat = NULL;
 
@@ -754,7 +781,7 @@ mraa_get_platform_version(int platform_offset)
 }
 
 int
-mraa_get_uart_count(void)
+mraa_get_uart_count()
 {
     if (plat == NULL) {
         return -1;
@@ -763,7 +790,7 @@ mraa_get_uart_count(void)
 }
 
 int
-mraa_get_spi_count(void)
+mraa_get_spi_bus_count()
 {
     if (plat == NULL) {
         return -1;
@@ -772,7 +799,7 @@ mraa_get_spi_count(void)
 }
 
 int
-mraa_get_pwm_count(void)
+mraa_get_pwm_count()
 {
     if (plat == NULL) {
         return -1;
@@ -781,7 +808,7 @@ mraa_get_pwm_count(void)
 }
 
 int
-mraa_get_gpio_count(void)
+mraa_get_gpio_count()
 {
     if (plat == NULL) {
         return -1;
@@ -790,7 +817,7 @@ mraa_get_gpio_count(void)
 }
 
 int
-mraa_get_aio_count(void)
+mraa_get_aio_count()
 {
     if (plat == NULL) {
         return -1;
@@ -883,7 +910,7 @@ mraa_gpio_lookup(const char* pin_name)
     for (i = 0; i < plat->gpio_count; i++) {
          if (plat->pins[i].name != NULL &&
              strncmp(pin_name, plat->pins[i].name, strlen(plat->pins[i].name) + 1) == 0) {
-             return plat->pins[i].gpio.pinmap;
+             return i;
          }
     }
     return -1;
@@ -1107,6 +1134,34 @@ mraa_link_targets(const char* filename, const char* targetname)
         free(buffer);
         return 0;
     }
+}
+
+mraa_result_t
+mraa_find_uart_bus_pci(const char* pci_dev_path, char** dev_name)
+{
+    char path[PATH_MAX];
+    const int max_allowable_len = 16;
+    snprintf(path, PATH_MAX - 1, "%s", pci_dev_path);
+    if (!mraa_file_exist(path)) {
+        return MRAA_ERROR_INVALID_PARAMETER;
+    }
+
+    struct dirent** namelist;
+    int n = scandir(path, &namelist, NULL, alphasort);
+    if (n <= 0) {
+        syslog(LOG_ERR, "Failed to find expected UART bus: %s", strerror(errno));
+        return MRAA_ERROR_INVALID_RESOURCE;
+    }
+
+    *dev_name = (char*) malloc(sizeof(char) * max_allowable_len);
+
+    snprintf(*dev_name, max_allowable_len, "/dev/%s", namelist[n - 1]->d_name);
+    while (n--) {
+        free(namelist[n]);
+    }
+    free(namelist);
+    syslog(LOG_INFO, "UART device: %s selected for initialization", *dev_name);
+    return MRAA_SUCCESS;
 }
 
 static int
