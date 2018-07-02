@@ -172,19 +172,29 @@ mraa_gpio_init(int pin)
         return NULL;
     }
 
-    if (board->chardev_capable) {
-        int pins[1] = { pin };
-        return mraa_gpio_init_multi(pins, 1);
-    }
+    /* If this pin belongs to a subplatform, then the pin member will contain
+     * the mraa pin index and the phy_pin will contain the subplatform's
+     * pin index.
+     *      example:  pin 515, dev->pin = 515, dev->phy_pin = 3
+     */
+    if (mraa_is_sub_platform_id(pin) && (board->sub_platform != NULL)) {
+        syslog(LOG_NOTICE, "gpio%i: initialised on sub platform '%s' physical pin: %i",
+                pin,
+                board->sub_platform->platform_name != NULL ?
+                board->sub_platform->platform_name : "",
+                mraa_get_sub_platform_index(pin));
 
-    if (mraa_is_sub_platform_id(pin)) {
-        syslog(LOG_NOTICE, "gpio%i: init: Using sub platform", pin);
         board = board->sub_platform;
         if (board == NULL) {
             syslog(LOG_ERR, "gpio%i: init: Sub platform not initialised", pin);
             return NULL;
         }
         pin = mraa_get_sub_platform_index(pin);
+    }
+
+    if (board->chardev_capable) {
+        int pins[1] = { pin };
+        return mraa_gpio_init_multi(pins, 1);
     }
 
     if (pin < 0 || pin >= board->phy_pin_count) {
@@ -599,7 +609,10 @@ mraa_gpio_interrupt_handler(void* arg)
         return NULL;
     }
 
-    if (plat->chardev_capable) {
+    /* Is this pin on a subplatform? Do nothing... */
+    if (mraa_is_sub_platform_id(dev->pin)) {}
+    /* Is the platform chardev_capable? */
+    else if (plat->chardev_capable) {
         mraa_gpiod_group_t gpio_group;
 
         for_each_gpio_group(gpio_group, dev) {
@@ -607,7 +620,9 @@ mraa_gpio_interrupt_handler(void* arg)
                 fps[idx++] = gpio_group->event_handles[i];
             }
         }
-    } else {
+    }
+    /* Else, attempt fs access */
+    else {
         mraa_gpio_context it = dev;
 
         while (it) {
@@ -901,7 +916,7 @@ mraa_gpio_isr_exit(mraa_gpio_context dev)
     dev->isr_thread_terminating = 1;
 
     // stop isr being useful
-    if (plat->chardev_capable)
+    if (plat && (plat->chardev_capable))
         _mraa_close_gpio_event_handles(dev);
     else
         ret = mraa_gpio_edge_mode(dev, MRAA_GPIO_EDGE_NONE);
@@ -941,13 +956,22 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
         syslog(LOG_ERR, "gpio: mode: context is invalid");
         return MRAA_ERROR_INVALID_HANDLE;
     }
+
+    if (IS_FUNC_DEFINED(dev, gpio_mode_replace))
+        return dev->advance_func->gpio_mode_replace(dev, mode);
+
+    if (IS_FUNC_DEFINED(dev, gpio_mode_pre)) {
+        mraa_result_t pre_ret = (dev->advance_func->gpio_mode_pre(dev, mode));
+        if (pre_ret != MRAA_SUCCESS)
+            return pre_ret;
+    }
+
     if (plat->chardev_capable) {
         unsigned flags = 0;
         int line_handle;
         mraa_gpiod_group_t gpio_iter;
 
         _mraa_close_gpio_desc(dev);
-
 
         /* We save flag values from the first valid line. */
         for_each_gpio_group(gpio_iter, dev) {
@@ -988,14 +1012,6 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
             gpio_iter->gpiod_handle = line_handle;
         }
     } else {
-        if (IS_FUNC_DEFINED(dev, gpio_mode_replace))
-            return dev->advance_func->gpio_mode_replace(dev, mode);
-
-        if (IS_FUNC_DEFINED(dev, gpio_mode_pre)) {
-            mraa_result_t pre_ret = (dev->advance_func->gpio_mode_pre(dev, mode));
-            if (pre_ret != MRAA_SUCCESS)
-                return pre_ret;
-        }
 
         if (dev->value_fp != -1) {
             close(dev->value_fp);
@@ -1037,9 +1053,10 @@ mraa_gpio_mode(mraa_gpio_context dev, mraa_gpio_mode_t mode)
         }
 
         close(drive);
-        if (IS_FUNC_DEFINED(dev, gpio_mode_post))
-            return dev->advance_func->gpio_mode_post(dev, mode);
     }
+
+    if (IS_FUNC_DEFINED(dev, gpio_mode_post))
+        return dev->advance_func->gpio_mode_post(dev, mode);
 
     return MRAA_SUCCESS;
 }
@@ -1104,24 +1121,23 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
+    if (IS_FUNC_DEFINED(dev, gpio_dir_replace)) {
+            return dev->advance_func->gpio_dir_replace(dev, dir);
+    }
+
+    if (IS_FUNC_DEFINED(dev, gpio_dir_pre)) {
+        mraa_result_t pre_ret = (dev->advance_func->gpio_dir_pre(dev, dir));
+        if (pre_ret != MRAA_SUCCESS) {
+            return pre_ret;
+        }
+    }
+
     if (plat->chardev_capable)
         return mraa_gpio_chardev_dir(dev, dir);
 
     mraa_gpio_context it = dev;
 
     while (it) {
-
-        if (IS_FUNC_DEFINED(it, gpio_dir_replace)) {
-                return it->advance_func->gpio_dir_replace(it, dir);
-        }
-
-        if (IS_FUNC_DEFINED(it, gpio_dir_pre)) {
-            mraa_result_t pre_ret = (it->advance_func->gpio_dir_pre(it, dir));
-            if (pre_ret != MRAA_SUCCESS) {
-                return pre_ret;
-            }
-        }
-
         if (it->value_fp != -1) {
             close(it->value_fp);
             it->value_fp = -1;
@@ -1173,11 +1189,11 @@ mraa_gpio_dir(mraa_gpio_context dev, mraa_gpio_dir_t dir)
         }
 
         close(direction);
-        if (IS_FUNC_DEFINED(it, gpio_dir_post))
-            return it->advance_func->gpio_dir_post(it, dir);
-
         it = it->next;
     }
+
+    if (IS_FUNC_DEFINED(dev, gpio_dir_post))
+        return dev->advance_func->gpio_dir_post(dev, dir);
 
     return MRAA_SUCCESS;
 }
@@ -1189,6 +1205,10 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
 
     /* Initialize with 'unusable'. */
     unsigned flags = GPIOLINE_FLAG_KERNEL;
+
+    if (IS_FUNC_DEFINED(dev, gpio_read_dir_replace)) {
+        return dev->advance_func->gpio_read_dir_replace(dev, dir);
+    }
 
     if (plat->chardev_capable) {
         mraa_gpiod_group_t gpio_iter;
@@ -1225,10 +1245,6 @@ mraa_gpio_read_dir(mraa_gpio_context dev, mraa_gpio_dir_t *dir)
         if (dir == NULL) {
             syslog(LOG_ERR, "gpio: read_dir: output parameter for dir is invalid");
             return MRAA_ERROR_INVALID_HANDLE;
-        }
-
-        if (IS_FUNC_DEFINED(dev, gpio_read_dir_replace)) {
-            return dev->advance_func->gpio_read_dir_replace(dev, dir);
         }
 
         snprintf(filepath, MAX_SIZE, SYSFS_CLASS_GPIO "/gpio%d/direction", dev->pin);
@@ -1268,6 +1284,10 @@ mraa_gpio_read(mraa_gpio_context dev)
         return -1;
     }
 
+    if (IS_FUNC_DEFINED(dev, gpio_read_replace)) {
+        return dev->advance_func->gpio_read_replace(dev);
+    }
+
     if (plat->chardev_capable) {
         int output_values[1] = { 0 };
 
@@ -1275,10 +1295,6 @@ mraa_gpio_read(mraa_gpio_context dev)
                 return -1;
 
         return output_values[0];
-    }
-
-    if (IS_FUNC_DEFINED(dev, gpio_read_replace)) {
-        return dev->advance_func->gpio_read_replace(dev);
     }
 
     if (dev->mmap_read != NULL) {
@@ -1371,16 +1387,6 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
         return MRAA_ERROR_INVALID_HANDLE;
     }
 
-    if (plat->chardev_capable) {
-        int input_values[1] = { value };
-
-        return mraa_gpio_write_multi(dev, input_values);
-    }
-
-    if (dev->mmap_write != NULL) {
-        return dev->mmap_write(dev, value);
-    }
-
     if (IS_FUNC_DEFINED(dev, gpio_write_pre)) {
         mraa_result_t pre_ret = (dev->advance_func->gpio_write_pre(dev, value));
         if (pre_ret != MRAA_SUCCESS)
@@ -1389,6 +1395,16 @@ mraa_gpio_write(mraa_gpio_context dev, int value)
 
     if (IS_FUNC_DEFINED(dev, gpio_write_replace)) {
         return dev->advance_func->gpio_write_replace(dev, value);
+    }
+
+    if (plat->chardev_capable) {
+        int input_values[1] = { value };
+
+        return mraa_gpio_write_multi(dev, input_values);
+    }
+
+    if (dev->mmap_write != NULL) {
+        return dev->mmap_write(dev, value);
     }
 
     if (dev->value_fp == -1) {
@@ -1560,7 +1576,10 @@ mraa_gpio_close(mraa_gpio_context dev)
         free(dev->events);
     }
 
-    if (plat->chardev_capable) {
+    /* Free any ISRs */
+    mraa_gpio_isr_exit(dev);
+
+    if (plat && plat->chardev_capable) {
         _mraa_free_gpio_groups(dev);
 
         free(dev);

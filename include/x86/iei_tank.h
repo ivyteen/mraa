@@ -1,6 +1,6 @@
 /*
- * Author: Henry Bruce <henry.bruce@intel.com>
- * Copyright (c) 2015 Intel Corporation.
+ * Author: Mihai Tudor Panu <mihai.tudor.panu@intel.com>
+ * Copyright (c) 2018 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -28,13 +28,13 @@
 extern "C" {
 #endif
 
-#include <dlfcn.h>
 #include "mraa_internal.h"
 
-mraa_result_t mraa_ftdi_ft4222_init();
-mraa_result_t mraa_ftdi_ft4222_get_version(unsigned int* versionChip, unsigned int* versionLib);
-mraa_board_t* mraa_ftdi_ft4222();
-void *libft4222_lib;
+#define MRAA_IEI_TANK_PINCOUNT  9
+#define MRAA_IEI_TANK_UARTCOUNT 6
+
+mraa_board_t*
+mraa_iei_tank();
 
 #ifdef __cplusplus
 }
