@@ -205,16 +205,24 @@ pwm_start()
 
 
 static void
-config_pwm1(uint32_t divisor)
+config_pwm1(uint32_t divisor, int pinn)
 {
-    /*GPIO 18 in ALT5 mode for PWM0 */
-    // Let's first set pin 18 to input
-    // taken from #define INP_GPIO(g) *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
-    *(gpio_reg + 1) &= ~(7 << 24);
-    // then set it to ALT5 function PWM0
-    // taken from #define SET_GPIO_ALT(g,a) *(gpio+(((g)/10))) |=
-    // (((a)<=3?(a)+4:(a)==4?3:2)<<(((g)%10)*3))
-    *(gpio_reg + 1) |= (2 << 24);
+    if (pinn == 0) {
+        /*GPIO 18 in ALT5 mode for PWM0 */
+        // Let's first set pin 18 to input
+        // taken from #define INP_GPIO(g) *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
+        *(gpio_reg + 1) &= ~(7 << 24);
+        // then set it to ALT5 function PWM0
+        // taken from #define SET_GPIO_ALT(g,a) *(gpio+(((g)/10))) |=
+        // (((a)<=3?(a)+4:(a)==4?3:2)<<(((g)%10)*3))
+        *(gpio_reg + 1) |= (2 << 24);
+    } else if (pinn == 1) {
+        /*GPIO 12 in ALT0 mode for PWM0 */
+        // Let's first set pin 12 to input
+        *(gpio_reg + 1) &= ~(7 << 6);
+        // then set it to ALT0 function PWM0
+        *(gpio_reg + 1) |= (4 << 6);
+    }
 
     pwm_stop();
 
@@ -251,7 +259,7 @@ mraa_raspberry_pi_duty_cycle_read_replace(mraa_pwm_context dev)
 mraa_result_t
 mraa_raspberry_pi_pwm_period_us_replace(mraa_pwm_context dev, int period)
 {
-    config_pwm1(calc_divisor(period / 1000));
+    config_pwm1(calc_divisor(period / 1000), dev->pin);
     dev->period = period;
     return MRAA_SUCCESS;
 }
@@ -285,7 +293,7 @@ mraa_raspberry_pi_pwm_enable_replace(mraa_pwm_context dev, int enable)
 mraa_result_t
 mraa_raspberry_pi_pwm_initraw_replace(mraa_pwm_context dev, int pin)
 {
-    if (pin != 0) {
+    if (pin >= 2) {
         return MRAA_ERROR_INVALID_PARAMETER;
     }
 
@@ -293,9 +301,11 @@ mraa_raspberry_pi_pwm_initraw_replace(mraa_pwm_context dev, int pin)
         return MRAA_ERROR_UNSPECIFIED;
     }
 
-    config_pwm1(DEFAULT_PERIOD_US);
+    config_pwm1(DEFAULT_PERIOD_US, dev->pin);
     *(pwm_reg + PWM_DAT1) = 0;
     dev->period = DEFAULT_PERIOD_US;
+
+    dev->pin = pin;
 
     return MRAA_SUCCESS;
 }
@@ -862,9 +872,10 @@ mraa_raspberry_pi()
         b->pins[31].gpio.mux_total = 0;
 
         strncpy(b->pins[32].name, "GPIO12", MRAA_PIN_NAME_SIZE);
-        b->pins[32].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+        b->pins[32].capabilities = (mraa_pincapabilities_t){ 1, 1, 1, 0, 0, 0, 0, 0 };
         b->pins[32].gpio.pinmap = pin_base + 12;
         b->pins[32].gpio.mux_total = 0;
+        b->pins[32].pwm.pinmap = 1;
 
         strncpy(b->pins[33].name, "GPIO13", MRAA_PIN_NAME_SIZE);
         b->pins[33].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
