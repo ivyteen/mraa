@@ -1,9 +1,6 @@
 /*
- * Author: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
- * Copyright (c) 2015 Linaro Limited.
- * Copyright (c) 2014 Intel Corporation.
- *
- * Copied from include/arm/banana.h
+ * Author: Mihai Stefanescu <mihai.stefanescu@rinftech.com>
+ * Copyright (c) 2018 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -25,23 +22,28 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#pragma once
+#include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "mraa/initio.h"
 
-#include "mraa_internal.h"
+int
+main()
+{
+    printf("Starting example\n");
 
-#define MRAA_96BOARDS_LS_GPIO_COUNT 12
-#define MRAA_96BOARDS_LS_I2C_COUNT  2
-#define MRAA_96BOARDS_LS_SPI_COUNT  1
-#define MRAA_96BOARDS_LS_UART_COUNT 2
-#define MRAA_96BOARDS_LS_PIN_COUNT  40
-#define MRAA_96BOARDS_LED_COUNT 6
+    mraa_io_descriptor* desc;
+    if (mraa_io_init("g:3:1-upm_stuff", &desc) != MRAA_SUCCESS) {
+        printf("Error in mraa_io_init()\n");
+    }
 
-mraa_board_t* mraa_96boards();
+    printf("Leftover string = %s\n", desc->leftover_str);
 
-#ifdef __cplusplus
+    /* Check value set in mraa_io_init. */
+    printf("Gpio value = %d\n", mraa_gpio_read(desc->gpios[0]));
+
+    if (mraa_io_close(desc) != MRAA_SUCCESS) {
+        printf("failed to close mraa io descriptor\n");
+    }
+
+    printf("Done\n");
 }
-#endif

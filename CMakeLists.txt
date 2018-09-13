@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 2.8.11)
 project (mraa C CXX)
 
 FIND_PACKAGE (Threads REQUIRED)
@@ -74,6 +74,17 @@ foreach (flag ${MRAA_BOTH_WARNING_FLAGS} ${MRAA_CXX_WARNING_FLAGS})
   endif ()
 endforeach ()
 
+# This function adds the c++11 flag to a c++ target (if supported)
+function(use_cxx_11 targetname)
+  include(CheckCXXCompilerFlag)
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  if (COMPILER_SUPPORTS_CXX11)
+    set_target_properties(${targetname} PROPERTIES COMPILE_FLAGS "-std=c++11")
+  else()
+    message(FATAL_ERROR "Target '${targetname}' requires c++11 which is not supported by this compiler")
+  endif()
+endfunction()
+
 # Set CMAKE_INSTALL_LIBDIR if not defined
 include(GNUInstallDirs)
 
@@ -99,7 +110,7 @@ include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
 if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_HEAD-HASH-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_-128-NOTFOUND")
   message (WARNING " - Install git to compile a production libmraa!")
-  set (VERSION "v1.9.0")
+  set (VERSION "v2.0.0")
 endif ()
 
 message (STATUS "INFO - libmraa Version ${VERSION}")

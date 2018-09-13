@@ -86,7 +86,9 @@ mraa_arm_platform()
     /* Get compatible string from Device tree for boards that dont have enough info in /proc/cpuinfo
      */
     if (platform_type == MRAA_UNKNOWN_PLATFORM) {
-        if (mraa_file_contains("/proc/device-tree/compatible", "qcom,apq8016-sbc"))
+        if (mraa_file_contains("/proc/device-tree/model", "s900"))
+            platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/compatible", "qcom,apq8016-sbc"))
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/compatible", "arrow,apq8096-db820c"))
             platform_type = MRAA_96BOARDS;
@@ -95,7 +97,9 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/model", "HiKey960"))
             platform_type = MRAA_96BOARDS;
-        else if (mraa_file_contains("/proc/device-tree/model", "s900"))
+        else if (mraa_file_contains("/proc/device-tree/model", "ROCK960"))
+            platform_type = MRAA_96BOARDS;
+        else if (mraa_file_contains("/proc/device-tree/model", "ZynqMP ZCU100 RevC"))
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;
