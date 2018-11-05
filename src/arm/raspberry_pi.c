@@ -513,7 +513,8 @@ mraa_raspberry_pi()
                     peripheral_base = BCM2836_PERI_BASE;
                     block_size = BCM2836_BLOCK_SIZE;
                 } else if (strstr(line, "a02082") || strstr(line, "a020a0") ||
-                           strstr(line, "a22082") || strstr(line, "a32082")) {
+                           strstr(line, "a22082") || strstr(line, "a32082") ||
+                           strstr(line, "a52082")                          ) {
                     b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B;
                     platform_detected = PLATFORM_RASPBERRY_PI3_B;
                     b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PINCOUNT;
@@ -530,9 +531,12 @@ mraa_raspberry_pi()
                     peripheral_base = BCM2837_PERI_BASE;
                     block_size = BCM2837_BLOCK_SIZE; 
                 } else {
-                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI_B_REV_1;
-                    platform_detected = PLATFORM_RASPBERRY_PI_B_REV_1;
-                    b->phy_pin_count = MRAA_RASPBERRY_PI_B_REV_1_PINCOUNT;
+                    /* default board: Raspberry Pi 3B */
+                    b->platform_name = PLATFORM_NAME_RASPBERRY_PI3_B;
+                    platform_detected = PLATFORM_RASPBERRY_PI3_B;
+                    b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PINCOUNT;
+                    peripheral_base = BCM2837_PERI_BASE;
+                    block_size = BCM2837_BLOCK_SIZE;
                 }
             }
         }
