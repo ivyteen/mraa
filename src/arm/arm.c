@@ -32,6 +32,7 @@
 #include "arm/beaglebone.h"
 #include "arm/phyboard.h"
 #include "arm/raspberry_pi.h"
+#include "arm/coral_dev_board.h"
 #include "mraa_internal.h"
 
 
@@ -94,6 +95,8 @@ mraa_arm_platform()
             platform_type = MRAA_96BOARDS;
         else if (mraa_file_contains("/proc/device-tree/compatible", "raspberrypi,"))
             platform_type = MRAA_RASPBERRY_PI;
+	else if (mraa_file_contains("/proc/device-tree/model", "Freescale i.MX8MQ Phanbell"))
+            platform_type = MRAA_CORAL_DEV_BOARD;
     }
 
     switch (platform_type) {
@@ -115,6 +118,9 @@ mraa_arm_platform()
         case MRAA_DE_NANO_SOC:
             plat = mraa_de_nano_soc();
             break;
+        case MRAA_CORAL_DEV_BOARD:
+            plat = mraa_coral_dev_board();
+	    break;
         default:
             plat = NULL;
             syslog(LOG_ERR, "Unknown Platform, currently not supported by MRAA");
