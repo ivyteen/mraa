@@ -537,6 +537,9 @@ mraa_raspberry_pi()
                     b->phy_pin_count = MRAA_RASPBERRY_PI3_B_PINCOUNT;
                     peripheral_base = BCM2837_PERI_BASE;
                     block_size = BCM2837_BLOCK_SIZE;
+
+                    /* check by device-tree again */
+                    tweakedCpuinfo = 0;
                 }
             }
         }
