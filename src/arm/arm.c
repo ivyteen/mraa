@@ -33,6 +33,7 @@
 #include "arm/phyboard.h"
 #include "arm/raspberry_pi.h"
 #include "arm/coral_dev_board.h"
+#include "arm/jetson_nano.h"
 #include "mraa_internal.h"
 
 
@@ -97,6 +98,8 @@ mraa_arm_platform()
             platform_type = MRAA_RASPBERRY_PI;
 	else if (mraa_file_contains("/proc/device-tree/model", "Freescale i.MX8MQ Phanbell"))
             platform_type = MRAA_CORAL_DEV_BOARD;
+        else if(mraa_file_contains("/proc/device-tree/model","jetson-nano"))
+            platform_type = MRAA_JETSON_NANO;
     }
 
     switch (platform_type) {
@@ -121,6 +124,9 @@ mraa_arm_platform()
         case MRAA_CORAL_DEV_BOARD:
             plat = mraa_coral_dev_board();
 	    break;
+        case MRAA_JETSON_NANO:
+            plat = mraa_jetson_nano();
+	     break;
         default:
             plat = NULL;
             syslog(LOG_ERR, "Unknown Platform, currently not supported by MRAA");

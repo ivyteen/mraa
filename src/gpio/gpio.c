@@ -164,6 +164,7 @@ mraa_gpio_init(int pin)
 
     mraa_gpio_context r = mraa_gpio_init_internal(board->adv_func, board->pins[pin].gpio.pinmap);
     if (r == NULL) {
+	syslog(LOG_ERR, "mraa gpio%d init internal failed\n",pin);
         return NULL;
     }
     if (r->phy_pin == -1)
@@ -173,6 +174,8 @@ mraa_gpio_init(int pin)
         mraa_result_t ret = r->advance_func->gpio_init_post(r);
         if (ret != MRAA_SUCCESS) {
             free(r);
+		
+		syslog(LOG_ERR, "mraa gpio%d init post failed\n",pin);
             return NULL;
         }
     }

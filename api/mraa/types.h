@@ -60,7 +60,7 @@ typedef enum {
     MRAA_MTK_LINKIT = 17,           /**< Mediatek MT7688 based Linkit boards */
     MRAA_MTK_OMEGA2 = 18,           /**< MT7688 based Onion Omega2 board */
     MRAA_CORAL_DEV_BOARD = 21,      /**< Coral Dev Board */
-
+	MRAA_JETSON_NANO = 22,
     // USB platform extenders start at 256
     MRAA_FTDI_FT4222 = 256,         /**< FTDI FT4222 USB to i2c bridge */
 
