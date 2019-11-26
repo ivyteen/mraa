@@ -102,6 +102,7 @@ set (mraa_LIB_ARM_SRCS_NOAUTO
   ${PROJECT_SOURCE_DIR}/src/arm/banana.c
   ${PROJECT_SOURCE_DIR}/src/arm/de_nano_soc.c
   ${PROJECT_SOURCE_DIR}/src/arm/axolotl_boards.c
+  ${PROJECT_SOURCE_DIR}/src/arm/rockpi4.c
 )
 
 set (mraa_LIB_MIPS_SRCS_NOAUTO

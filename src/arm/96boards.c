@@ -64,7 +64,8 @@ int db410c_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
 };
 
 const char* db410c_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyMSM0", "/dev/ttyMSM1" };
-const char* db410c_led[MRAA_96BOARDS_LED_COUNT] = { "user1", "user2", "user3", "user4", "bt", "wlan" };
+const char* db410c_led[MRAA_96BOARDS_LED_COUNT] = { "user1", "user2", "user3",
+                                                    "user4", "bt", "wlan" };
 
 // Dragonboard820c
 int db820c_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = {
@@ -99,8 +100,12 @@ int hikey960_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
 const char* hikey960_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyAMA3", "/dev/ttyAMA6" };
 
 // Rock960
-int rock960_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 
-    1006, 1002, 1041, 1042, 1121, 1128, 1124, 1131, 1125, 1132, 1050, 1055 
+int rock960_ls_gpio_pins[MRAA_96BOARDS_LS_GPIO_COUNT] = { 1006, 1002, 1041, 1042, 1121, 1128,
+                                                          1124, 1131, 1125, 1132, 1050, 1055 };
+
+int rock960_chardev_map[MRAA_96BOARDS_LS_GPIO_COUNT][2] = {
+    { 0, 6 },  { 0, 2 }, { 1, 9 },  { 1, 10 }, { 3, 25 }, { 4, 0 },
+    { 3, 28 }, { 4, 3 }, { 3, 29 }, { 4, 4 },  { 1, 18 }, { 1, 23 },
 };
 
 const char* rock960_serialdev[MRAA_96BOARDS_LS_UART_COUNT] = { "/dev/ttyS3", "/dev/ttyS4" };
@@ -302,9 +307,12 @@ mraa_96boards()
         } else if (mraa_file_contains(DT_BASE "/model", "ROCK960")) {
             b->platform_name = PLATFORM_NAME_ROCK960;
             ls_gpio_pins = rock960_ls_gpio_pins;
+            chardev_map = &rock960_chardev_map;
             b->uart_dev[0].device_path = (char*) rock960_serialdev[0];
             b->uart_dev[1].device_path = (char*) rock960_serialdev[1];
-        } else if (mraa_file_contains(DT_BASE "/model", "ZynqMP ZCU100 RevC")) {
+            b->chardev_capable = 1;
+        } else if ((mraa_file_contains(DT_BASE "/model", "ZynqMP ZCU100 RevC")) ||
+                   (mraa_file_contains(DT_BASE "/model", "Avnet Ultra96 Rev1"))) {
             b->platform_name = PLATFORM_NAME_ULTRA96;
             chardev_map = &ultra96_chardev_map;
             b->uart_dev[0].device_path = (char*) ultra96_serialdev[0];

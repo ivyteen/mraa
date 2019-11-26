@@ -171,9 +171,13 @@ parse_uart(char** proto, size_t n, const char* proto_full)
 
     /* Check for bytesize. */
     int bytesize = -1;
-    if (mraa_atoi_x(proto[idx], &end, &bytesize, 0) != MRAA_SUCCESS) {
+    if (proto[idx] != NULL && mraa_atoi_x(proto[idx], &end, &bytesize, 0) != MRAA_SUCCESS) {
         syslog(LOG_ERR, "parse_uart: error reading uart bytesize '%d' from '%s'", bytesize, proto_full);
         mraa_uart_stop(dev);
+        return NULL;
+    }
+
+    if (end == NULL) {
         return NULL;
     }
 
@@ -370,11 +374,11 @@ parse_i2c(char** proto, size_t n, const char* proto_full)
     }
 
     int mode = -1;
-    if (strncmp(proto[idx], I_MODE_STD, strlen(I_MODE_STD)) == 0) {
+    if (proto[idx] && strncmp(proto[idx], I_MODE_STD, strlen(I_MODE_STD)) == 0) {
         mode = MRAA_I2C_STD;
-    } else if (strncmp(proto[idx], I_MODE_FAST, strlen(I_MODE_FAST)) == 0) {
+    } else if (proto[idx] && strncmp(proto[idx], I_MODE_FAST, strlen(I_MODE_FAST)) == 0) {
         mode = MRAA_I2C_FAST;
-    } else if (strncmp(proto[idx], I_MODE_HIGH, strlen(I_MODE_HIGH)) == 0) {
+    } else if (proto[idx] && strncmp(proto[idx], I_MODE_HIGH, strlen(I_MODE_HIGH)) == 0) {
         mode = MRAA_GPIO_PULLDOWN;
     }
 
@@ -701,6 +705,7 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
             if (!dev) {
                 syslog(LOG_ERR, "mraa_io_init: error parsing pwm init string '%s'", str_descs[i]);
                 status = MRAA_ERROR_INVALID_HANDLE;
+                free(new_desc);
             }
 
             if (status == MRAA_SUCCESS) {
@@ -787,7 +792,6 @@ mraa_io_init(const char* strdesc, mraa_io_descriptor** desc)
                     strncat(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
                 }
 
-                strncat(new_desc->leftover_str, str_descs[i], strlen(str_descs[i]));
                 leftover_str_len += strlen(str_descs[i]) + 1;
                 new_desc->leftover_str[leftover_str_len - 1] = ',';
                 new_desc->leftover_str[leftover_str_len] = '\0';

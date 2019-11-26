@@ -1,6 +1,6 @@
 /*
- * Author: David Antler <david.a.antler@intel.com>
- * Copyright (c) 2016 Intel Corporation.
+ * Author: Brian <brian@vamrs.com>
+ * Copyright (c) 2019 Vamrs Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -20,36 +20,27 @@
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- *
- * @fileoverview Implementation of a LightBulb class abstraction
- *
  */
 
-module.exports = (function() {
-    "use strict";
-    var m = require('../index');
+#pragma once
 
-    /**
-     * Constructor for a new LightBulb
-     * @class LightBulb
-     *
-     * @classdesc This class abstracts access to the control and data registers
-     * on an imaginary lightbulb.
-     * @param {Object} A libmraa I2c object, initialized
-     */
-    function LightBulb (i2cInterface) {
-        var self = this;
-        self._i2cInterface = i2cInterface;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-        self.getBrightness = function() {
-            // Presume our brightness data is one byte at offset 4
-            return self._i2cInterface.readReg(4);
-        }
+#include "mraa_internal.h"
 
-        return self;
-    }
+#define MRAA_ROCKPI4_GPIO_COUNT 27
+#define MRAA_ROCKPI4_I2C_COUNT  3
+#define MRAA_ROCKPI4_SPI_COUNT  2
+#define MRAA_ROCKPI4_UART_COUNT 2
+#define MRAA_ROCKPI4_PWM_COUNT  2
+#define MRAA_ROCKPI4_AIO_COUNT  1
+#define MRAA_ROCKPI4_PIN_COUNT  40
 
-    return LightBulb;
-})();
+mraa_board_t *
+        mraa_rockpi4();
 
+#ifdef __cplusplus
+}
+#endif
