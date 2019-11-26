@@ -27,16 +27,27 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
+//#include <stdio.h>
 
 #include "arm/axolotl_boards.h"
 #include "common.h"
+
+//BHAHN FOR HYODOL PROTOTYPE
+#define MCP23017_GPIO_EXPANDER
+
 
 #define DT_BASE "/proc/device-tree"
 #define PLATFORM_NAME_MAX_SIZE 64
 
 // ReSpeaker Core v2.0
+#ifndef MCP23017_GPIO_EXPANDER
 #define PLATFORM_NAME_RESPEAKVER2 "ReSpeaker Core v2.0"
 #define MRAA_RESPEAKER2_PHY_PIN_COUNT 13 
+#else
+#define PLATFORM_NAME_RESPEAKVER2 "Hyodol - ReSpk Core v2.0"
+#define MRAA_RESPEAKER2_PHY_PIN_COUNT 29 
+#endif
+
 
 /*
 Pin index definition for headers :
@@ -83,6 +94,30 @@ Pin index definition for headers :
 | :--- | :--------------- | :-------- | :--------- |
 | 0    | 8                | --        | I2C2_SCL   |
 | 0    | 9                | --        | I2C2_SDA   |
+
+
+//BHAHN FOR HYODOL PROTOTYPE
+** MCP23017 GPIO EXPANDER **
+| MRAA | MCP23017 PIN INDEX | SYSFS PIN |
+| :--- | :---------------   | :-------- |
+| 13   | GPA0               | 272       |
+| 14   | GPA1               | 273       |
+| 15   | GPA2               | 274       |
+| 16   | GPA3               | 275       |
+| 17   | GPA4               | 276       |
+| 18   | GPA5               | 277       |
+| 19   | GPA6               | 278       |
+| 20   | GPA7               | 279       |
+| 21   | GPB0               | 280       |
+| 22   | GPB1               | 281       |
+| 23   | GPB2               | 282       |
+| 24   | GPB3               | 283       |
+| 25   | GPB4               | 284       |
+| 26   | GPB5               | 285       |
+| 27   | GPB6               | 286       |
+| 28   | GPB7               | 287       |
+
+
 
 */
 int
@@ -184,6 +219,92 @@ mraa_add_board_respeaker2(mraa_board_t* b)
     b->pins[12].gpio.pinmap = 66;
     b->pins[12].gpio.mux_total = 0;
 
+
+#ifdef MCP23017_GPIO_EXPANDER
+    strncpy(b->pins[13].name, "GPIO272", MRAA_PIN_NAME_SIZE);
+    b->pins[13].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[13].gpio.pinmap = 272;
+    b->pins[13].gpio.mux_total = 0;
+
+    strncpy(b->pins[14].name, "GPIO273", MRAA_PIN_NAME_SIZE);
+    b->pins[14].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[14].gpio.pinmap = 273;
+    b->pins[14].gpio.mux_total = 0;
+
+    strncpy(b->pins[15].name, "GPIO274", MRAA_PIN_NAME_SIZE);
+    b->pins[15].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[15].gpio.pinmap = 274;
+    b->pins[15].gpio.mux_total = 0;
+
+    strncpy(b->pins[16].name, "GPIO275", MRAA_PIN_NAME_SIZE);
+    b->pins[16].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[16].gpio.pinmap = 275;
+    b->pins[16].gpio.mux_total = 0;
+
+    strncpy(b->pins[17].name, "GPIO276", MRAA_PIN_NAME_SIZE);
+    b->pins[17].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[17].gpio.pinmap = 276;
+    b->pins[17].gpio.mux_total = 0;
+
+    strncpy(b->pins[18].name, "GPIO277", MRAA_PIN_NAME_SIZE);
+    b->pins[18].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[18].gpio.pinmap = 277;
+    b->pins[18].gpio.mux_total = 0;
+
+    strncpy(b->pins[19].name, "GPIO278", MRAA_PIN_NAME_SIZE);
+    b->pins[19].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[19].gpio.pinmap = 278;
+    b->pins[19].gpio.mux_total = 0;
+
+    strncpy(b->pins[20].name, "GPIO279", MRAA_PIN_NAME_SIZE);
+    b->pins[20].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[20].gpio.pinmap = 279;
+    b->pins[20].gpio.mux_total = 0;
+
+    strncpy(b->pins[21].name, "GPIO280", MRAA_PIN_NAME_SIZE);
+    b->pins[21].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[21].gpio.pinmap = 280;
+    b->pins[21].gpio.mux_total = 0;
+
+    strncpy(b->pins[22].name, "GPIO281", MRAA_PIN_NAME_SIZE);
+    b->pins[22].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[22].gpio.pinmap = 281;
+    b->pins[22].gpio.mux_total = 0;
+
+    strncpy(b->pins[23].name, "GPIO282", MRAA_PIN_NAME_SIZE);
+    b->pins[23].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[23].gpio.pinmap = 282;
+    b->pins[23].gpio.mux_total = 0;
+
+    strncpy(b->pins[24].name, "GPIO283", MRAA_PIN_NAME_SIZE);
+    b->pins[24].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[24].gpio.pinmap = 283;
+    b->pins[24].gpio.mux_total = 0;
+
+    strncpy(b->pins[25].name, "GPIO284", MRAA_PIN_NAME_SIZE);
+    b->pins[25].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[25].gpio.pinmap = 284;
+    b->pins[25].gpio.mux_total = 0;
+
+    strncpy(b->pins[26].name, "GPIO285", MRAA_PIN_NAME_SIZE);
+    b->pins[26].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[26].gpio.pinmap = 285;
+    b->pins[26].gpio.mux_total = 0;
+
+    strncpy(b->pins[27].name, "GPIO286", MRAA_PIN_NAME_SIZE);
+    b->pins[27].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[27].gpio.pinmap = 286;
+    b->pins[27].gpio.mux_total = 0;
+
+    strncpy(b->pins[28].name, "GPIO287", MRAA_PIN_NAME_SIZE);
+    b->pins[28].capabilities = (mraa_pincapabilities_t){ 1, 1, 0, 0, 0, 0, 0, 0 };
+    b->pins[28].gpio.pinmap = 287;
+    b->pins[28].gpio.mux_total = 0;
+
+#endif //MCP23017_GPIO_EXPANDER
+
+
+
     // BUS DEFINITIONS
 
     // I2C
@@ -214,6 +335,8 @@ mraa_add_board_respeaker2(mraa_board_t* b)
         }
     }
 
+//	printf("Gpio count : %d %d \n",b->phy_pin_count,b->gpio_count++);
+
     return 0;
 }
 
@@ -221,6 +344,10 @@ mraa_board_t*
 mraa_axolotl_boards()
 {
     int ret = -1;
+
+#ifdef MCP23017_GPIO_EXPANDER
+   
+#endif
 
     mraa_board_t* b = (mraa_board_t*) calloc(1, sizeof(mraa_board_t));
     if (b == NULL) {
